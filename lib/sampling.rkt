@@ -40,14 +40,14 @@
       (hash-set assignment var (not (hash-ref assignment var))))))
 
 (define Metropolis
-  (λ (init-assignment get-energy T steps)
+  (λ (init-assignment sampling-prob propose steps)
     (letrec ([Metropolis-helper (λ (assignment steps)
                                   (cond
                                     [(= steps 0) assignment]
                                     [else
                                      (let* ([proposal (propose assignment)]
-                                            [accept-prob (min 1 (/ (Boltzmann-distribution (get-energy proposal) T)
-                                                                   (Boltzmann-distribution (get-energy assignment) T)))])
+                                            [accept-prob (min 1 (/ (sampling-prob proposal)
+                                                                   (sampling-prob assignment)))])
                                        (if (< (random) accept-prob)
                                            (Metropolis-helper proposal (- steps 1))
                                            (Metropolis-helper assignment (- steps 1))))]))])
@@ -61,4 +61,4 @@
 (define init-assignment (build-init-assignment 5))
 (define clauses '((1) (2) (3) (4) (5)))
 
-(Metropolis init-assignment (get-energy clauses) 0.1 200)
+(Metropolis init-assignment (λ (p) (Boltzmann-distribution ((get-energy clauses) p) 0.1)) propose 30)
