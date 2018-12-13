@@ -42,6 +42,10 @@
   (λ (bit)
     (if bit #f #t)))
 
+(define uninformed-random-walk
+  (λ (sol)
+    (hash-update sol (+ 1 (random (hash-count sol))) flip-bit)))
+
 (define get-1-exchange-neighbors
   (λ (sol)
     (for/list ([v (in-range (hash-count sol))])

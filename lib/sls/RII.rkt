@@ -5,13 +5,13 @@
 ;; Randomized Iterative Improvement
 ;; in Hoos & Stützle chapter 2
 
-(define uninformed-random-walk
-  (λ (sol)
-    (hash-update sol (+ 1 (random (hash-count sol))) flip-bit)))
-
 (define iterative-improve
   (λ (clauses sol)
     (let ([neighbors (get-1-exchange-neighbors sol)])
+      ;; neighbor selection: best improvement
+      ;; problem with this method -- when the number
+      ;; of variables is largeg, to get the mimimum value
+      ;; is too expensive
       (let ([ts (argmins car (map (λ (s) (cons (get-unsat-clauses clauses s) s)) neighbors))])
         (cdr (list-ref ts (random (length ts))))))))
 
