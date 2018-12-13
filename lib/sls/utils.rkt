@@ -47,6 +47,7 @@
     (for/list ([v (in-range (hash-count sol))])
       (hash-update sol (+ v 1) flip-bit))))
 
+;; instead of argmin, return a list of mins
 (define argmins
   (λ (proc lst)
     (if (null? lst)
@@ -58,3 +59,16 @@
                      [(< ve vr)  `(,e)]
                      [(= ve vr) (cons e r)]
                      [else r]))) `(,(car lst)) (cdr lst)))))
+
+;; an irrelevant function
+(define solution->string
+  (λ (assignment size)
+    (letrec ([solution->string^ (λ (idxs)
+                                  (cond
+                                    [(null? idxs) ""]
+                                    [else
+                                     (let ([idx (+ 1 (car idxs))])
+                                       (string-append (if (hash-ref assignment idx) "X" "O")
+                                                      (string-append (if (= (modulo idx size) 0) "\n" "")
+                                                                     (solution->string^ (cdr idxs)))))]))])
+      (solution->string^ (range (hash-count assignment))))))
