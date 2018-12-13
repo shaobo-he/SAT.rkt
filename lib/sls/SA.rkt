@@ -3,8 +3,6 @@
 (require "dpll.rkt")
 (require "parser.rkt")
 
-(provide (all-defined-out))
-
 ; based on paper: Uniform Solution Sampling Using a Constraint Solver As an Oracle
 
 ; first MCMC
@@ -12,26 +10,6 @@
 (define Boltzmann-distribution
   (λ (E T)
     (exp (- 0 (/ E T)))))
-
-(define satisfying-literal?
-  (λ (assignment lit)
-    (match lit
-      [`(not ,var) (not (hash-ref assignment var))]
-      [else (hash-ref assignment lit)])))
-
-(define satisfying-clause?
-  (λ (assignment clause)
-    (cond
-      [(null? clause) #f]
-      [else (or (satisfying-literal? assignment (car clause))
-                (satisfying-clause? assignment (cdr clause)))])))
-
-(define satisfying-clauses?
-  (λ (assignment clauses)
-    (cond
-      [(null? clauses) #t]
-      [else (and (satisfying-clause? assignment (car clauses))
-                (satisfying-clauses? assignment (cdr clauses)))])))
 
 (define get-energy
   (λ (clauses)
@@ -61,11 +39,6 @@
                                            (Metropolis-helper assignment (- steps 1))))]))])
       (Metropolis-helper init-assignment steps))))
 
-(define build-init-assignment
-  (λ (var-num)
-    (let ([flip-a-coin (λ () (if (= (random 2) 0) #f #t))])
-      (foldl (λ (var-id assignment) (hash-set assignment (+ var-id 1) (flip-a-coin))) (hash) (range var-num)))))
-
 (define init-assignment (build-init-assignment 25))
 (define clauses (parse-dimacs-file "../tests/5queens.cnf"))
 ;(define clauses '((1 2 3 4 5)))
@@ -73,7 +46,7 @@
 (define result (filter (λ (a) (satisfying-clauses? a clauses))
         (map (λ (x)
                (Metropolis init-assignment (λ (p) (Boltzmann-distribution
-                                                   ((get-energy clauses) p) 0.1)) propose 500))
+                                                   ((get-energy clauses) p) 0.1)) propose 2000))
              (range 100))))
 
 (define solution->string
@@ -105,3 +78,5 @@
                   (count-solutions
                    (cdr str-sols)
                    (hash-set ht str-sol 1))))])))
+
+ (count-solutions str-sols (hash))
