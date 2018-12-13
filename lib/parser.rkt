@@ -34,3 +34,14 @@
 
 (define (parse-dimacs-file filename)
   (call-with-input-file filename parse))
+
+(define (get-var-number filename)
+  (letrec ([do (λ (port)
+                 (let ([line (read-line port 'any)])
+                   (if (eof-object? line)
+                       (error "cannot get the number of variables!")
+                       (let ([lst (string-split line)])
+                         (match lst
+                           [`("p" "cnf" ,nums ...) (string->number (car nums))]
+                           [_ (do port)])))))])
+    (call-with-input-file filename do)))
