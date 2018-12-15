@@ -42,6 +42,10 @@
   (λ (bit)
     (if bit #f #t)))
 
+(define flip-var
+  (λ (v sol)
+    (hash-update sol v flip-bit)))
+
 (define uninformed-random-walk
   (λ (sol)
     (hash-update sol (+ 1 (random (hash-count sol))) flip-bit)))
